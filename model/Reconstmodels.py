@@ -182,4 +182,60 @@ class ConvAutoencoder4(torch.nn.Module):
         decoded = self.decoder(coded)
         return decoded
         
+
+class ConvAutoencoder5(torch.nn.Module):
+    def __init__(self):
+        super(ConvAutoencoder5, self).__init__()
+
+        self.net = ConvAutoencoder4()
+
+        self.encoder = torch.nn.Sequential(
+            torch.nn.Conv2d(1, 64, 
+                            kernel_size=(3,3), 
+                            stride=1, padding=1),  
+            torch.nn.ReLU(True),
+            torch.nn.MaxPool2d(2, stride=2),
+            torch.nn.Conv2d(64, 16, kernel_size=(3,3), 
+                            stride=1, padding=1),  
+            torch.nn.ReLU(True),
+            torch.nn.MaxPool2d(2, stride=2) ,
+                torch.nn.Conv2d(16, 16, kernel_size=(3,3), 
+                            stride=1, padding=1),  
+            torch.nn.ReLU(True),
+            torch.nn.MaxPool2d(2, stride=2),
+                torch.nn.Conv2d(16, 16, kernel_size=(3,3), 
+                            stride=1, padding=1),  
+            torch.nn.ReLU(True),
+
+        )
+
+        self.decoder = torch.nn.Sequential(
+#             torch.nn.Upsample(scale_factor=2, mode='nearest'),
+#             torch.nn.ConvTranspose2d(1, 4, 3, stride=1, padding=1), 
+#             torch.nn.ReLU(True),
+            
+#             torch.nn.Upsample(scale_factor=2, mode='nearest'),
+#             torch.nn.ConvTranspose2d(4, 8, 3, stride=1, padding=1), 
+#             torch.nn.ReLU(True),
+    
+            torch.nn.Upsample(scale_factor=(37+38)/(2*18), mode='nearest'),
+            torch.nn.ConvTranspose2d(16, 16, 3, stride=1, padding=1), 
+            torch.nn.ReLU(True),
+            torch.nn.Upsample(scale_factor=2, mode='nearest'),
+            torch.nn.ConvTranspose2d(16, 64, 3, stride=1, padding=1), 
+            torch.nn.ReLU(True),
+            torch.nn.Upsample(scale_factor=(150+151)/(2*74),mode='nearest'),
+            torch.nn.ConvTranspose2d(64, 1, 3, stride=1, padding=1), 
+            torch.nn.Tanh()
+        )
         
+    def encoder_func(self, inp):
+    	return self.encoder(inp)
+    def decoder_func(self, inp):
+    	return self.decoder(inp)
+    		    
+
+    def forward(self, x):
+        coded = self.encoder(x)
+        decoded = self.decoder(coded)
+        return decoded        
